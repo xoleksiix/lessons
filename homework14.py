@@ -5,4 +5,5 @@ def multiplication_of_numbers(x):
     return result
 
 if __name__ == '__main__':
-    print(multiplication_of_numbers(int(input("Введите число:"))))
+    numbers = int(input("Введите число:"))
+    print(multiplication_of_numbers(numbers))
