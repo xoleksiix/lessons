@@ -8,7 +8,7 @@ def arithmetic(a, b, operator):
     :param operator: str
     :return: result of operation or error.
     """
-    operation = {"+" : a + b, "-" : a - b, "*" : a * b, "/" : a / b if b != 0 else "На ноль делить нельзя."}
+    operation = {"+": a + b, "-": a - b, "*": a * b, "/": a / b if b != 0 else "На ноль делить нельзя."}
     return operation.get(operator, "Неизвестная операция.")
 
 
