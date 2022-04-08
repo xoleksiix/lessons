@@ -3,7 +3,8 @@ from functools import wraps
 
 def authenticate(check: bool, i: int) -> bool:
     """
-
+    displays messages based on password verification(check)
+    and the number(i) of access attempts.
     :param check: bool
     :param i: int
     :return: bool
