@@ -12,10 +12,12 @@ def authenticate() -> bool:
 
 def login_wrapper(func):
     @wraps(func)
-    def wrapper(*args, **kwargs):
-        return check_password(data, username_input, password_input) \
-               & authenticate() & func(username_input,password_input)
+    def wrapper(username, password):
+        return check_password(data, username, password) \
+               & authenticate() & func(username, password)
+
     return wrapper
+
 
 @login_wrapper
 def login(username: str, password: str) -> bool:
@@ -27,7 +29,7 @@ if __name__ == '__main__':
     data = {"user": "0000",
             "admin": "admin",
             "somebody": "qwerty"}
-    attempt = 3                                         #кол-во попыток
+    attempt = 3  # кол-во попыток
 
     while attempt > 0:
         username_input = input("Имя:")
