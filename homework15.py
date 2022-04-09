@@ -15,7 +15,6 @@ def login_wrapper(func):
     def wrapper(username, password):
         return check_password(data, username, password) \
                & authenticate() & func(username, password)
-
     return wrapper
 
 
