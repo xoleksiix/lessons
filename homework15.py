@@ -36,7 +36,7 @@ if __name__ == '__main__':
         if login(username_input, password_input):
             print("Вы в системе!")
             break
-        attempt = attempt - 1
+        attempt -= 1
         print("Не правильное Имя или Пароль")
         print(f"У вас осталось {attempt} попыток" if attempt != 0
               else "Попытки истекли!")
