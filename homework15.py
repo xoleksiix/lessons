@@ -2,7 +2,7 @@ from functools import wraps
 
 
 def check_password(data: dict, username: str, password: str) -> bool:
-    return True if data.get(username) == password else False
+    return data.get(username) == password
 
 
 def authenticate() -> bool:
