@@ -9,7 +9,7 @@ def check_win(board):
         return board[2][2]
     elif board[1][0] == board[1][1] == board[1][2] \
             or board[0][1] == board[1][1] == board[2][1]:
-        return board[2][2]
+        return board[1][1]
     else:
         return "D"
 
