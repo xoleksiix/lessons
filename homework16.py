@@ -24,4 +24,4 @@ if __name__ == '__main__':
              "XOX",
              "XOO"]
 
-  print(check_win(board))
+    print(check_win(board))
