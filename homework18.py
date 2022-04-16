@@ -63,16 +63,26 @@ if __name__ == '__main__':
             print(f"Вы заблокированы! Следующая попытка через "
                   f"{check_last_login(cooldown_for_login)} мин.")
             break
-        else:
-            username_input = username if username else input("Имя:")
-            password_input = password if password else input("Пароль:")
-            if login(username_input, password_input):
+
+        if (username or password) and attempt == 3:
+            if login(username if username else input("Имя:"),
+                     password if password else input("Пароль:")):
                 print("Вы в системе!")
-                break
-            attempt -= 1
-            if attempt:
+            else:
+                attempt -= 1
                 print(f"Неправильное имя или пароль. "
                       f"У вас осталось {attempt} попыток")
-            else:
-                print("Попытки истекли!")
-                add_last_time_login()
+                continue
+
+        username_input = input("Имя:")
+        password_input = input("Пароль:")
+        if login(username_input, password_input):
+            print("Вы в системе!")
+            break
+        attempt -= 1
+        if attempt:
+            print(f"Неправильное имя или пароль. "
+                  f"У вас осталось {attempt} попыток")
+        else:
+            print("Попытки истекли!")
+            add_last_time_login()
