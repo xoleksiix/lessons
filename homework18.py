@@ -43,10 +43,10 @@ def check_last_login(cd_for_login: int) -> int:
 
 
 def parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-l", dest="username")
-    parser.add_argument("-p", dest="password")
-    return parser.parse_args()
+    parser_args = argparse.ArgumentParser()
+    parser_args.add_argument("-l", "--user", dest="username")
+    parser_args.add_argument("-p", "--pass", dest="password")
+    return parser_args.parse_args()
 
 
 if __name__ == '__main__':
@@ -55,7 +55,8 @@ if __name__ == '__main__':
             "somebody": "qwerty"}
     attempt = 3  # кол-во попыток
     cooldown_for_login = 0  # время для повторной попытки в минутах
-    username, password = parser().username, parser().password
+    args = parser()
+    username, password = args.username, args.password
 
     while attempt > 0:
         if check_last_login(cooldown_for_login) > 0:
