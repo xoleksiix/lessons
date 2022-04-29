@@ -42,7 +42,6 @@ def login_wrapper(func):
         else:
             return check_password(data, username, password) \
                    & authenticate() & func(username, password)
-
     return wrapper
 
 
