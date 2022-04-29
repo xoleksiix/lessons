@@ -53,14 +53,14 @@ def login(username: str, password: str) -> bool:
 
 
 def add_last_time_login(user):
-    data_of_logins = read_data("test/lasttimelogin.json")
+    data_of_logins = read_data("lasttimelogin.json")
     last_time_login = {user: datetime.now().strftime("%m/%d/%Y, %H:%M:%S")}
     data_of_logins.update(last_time_login)
-    write_data("test/lasttimelogin.json", data_of_logins)
+    write_data("lasttimelogin.json", data_of_logins)
 
 
 def check_last_login(cd_for_login: int, username) -> int:
-    data_of_logins = read_data("test/lasttimelogin.json")
+    data_of_logins = read_data("lasttimelogin.json")
     if data_of_logins.get(username) is None:
         return 0
     last_time_login = datetime.strptime(data_of_logins.get(username),
@@ -76,13 +76,13 @@ def parser():
 
 
 def registration(username: str, password: str):
-    data = read_data("test/data.json")
+    data = read_data("data.json")
     data.update({username: password})
-    write_data("test/data.json", data)
+    write_data("data.json", data)
 
 
 if __name__ == '__main__':
-    data = read_data("test/data.json")
+    data = read_data("data.json")
     attempt = 3  # кол-во попыток
     cooldown_for_login = 5  # время для повторной попытки в минутах
     args = parser()
