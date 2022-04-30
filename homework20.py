@@ -87,52 +87,52 @@ if __name__ == '__main__':
     args = parser()
     username, password = args.username, args.password
 
-    while attempt > 0:
-        if attempt == 3:
-            ask = input("Sing [in/up]? ")
-            if ask.lower() == "up":
-                while True:
-                    username = input("Username: ")
-                    password = input("Password: ")
-                    if data.get(username):
-                        print("Username already taken!")
-                    else:
-                        break
-                registration(username, password)
-                print("Registration successful. You are in the system!")
+    ask = input("Sing [in/up]? ")
+    if ask.lower() == "up":
+        while True:
+            username = input("Username: ")
+            password = input("Password: ")
+            if data.get(username):
+                print("Username already taken!")
+            else:
                 break
+        registration(username, password)
+        print("Registration successful. You are in the system!")
+    elif ask.lower() == "in":
+        while attempt > 0:
+            if (username or password) and attempt == 3:
+                if username and check_last_login(cooldown_for_login, username) > 0:
+                    print(f"You are blocked! Next try in "
+                          f"{check_last_login(cooldown_for_login, username)} "
+                          f"min.")
+                    break
 
-        if (username or password) and attempt == 3:
-            if username and check_last_login(cooldown_for_login, username) > 0:
+                if login(username if username else input("Username:"),
+                         password if password else input("Password:")):
+                    print("You are in the system!")
+                else:
+                    attempt -= 1
+                    print(f"You have {attempt} attempt(s) left")
+                    continue
+
+            username = input("Username: ")
+            password = input("Password: ")
+
+            if check_last_login(cooldown_for_login, username) > 0:
                 print(f"You are blocked! Next try in "
                       f"{check_last_login(cooldown_for_login, username)} "
                       f"min.")
                 break
 
-            if login(username if username else input("Username:"),
-                     password if password else input("Password:")):
+            if login(username, password):
                 print("You are in the system!")
+                break
             else:
                 attempt -= 1
-                print(f"You have {attempt} attempt(s) left")
-                continue
-
-        username = input("Username: ")
-        password = input("Password: ")
-
-        if check_last_login(cooldown_for_login, username) > 0:
-            print(f"You are blocked! Next try in "
-                  f"{check_last_login(cooldown_for_login, username)} "
-                  f"min.")
-            break
-
-        if login(username, password):
-            print("You are in the system!")
-            break
-        else:
-            attempt -= 1
-            if attempt:
-                print(f"You have {attempt} attempt(s) left")
-            else:
-                print("The attempts are over!")
-                add_last_time_login(username)
+                if attempt:
+                    print(f"You have {attempt} attempt(s) left")
+                else:
+                    print("The attempts are over!")
+                    add_last_time_login(username)
+    else:
+        print("Incorrect input!")
