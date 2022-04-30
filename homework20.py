@@ -102,10 +102,11 @@ if __name__ == '__main__':
     if ask.lower() == "up":
         while True:
             username = input("Username: ")
-            password = input("Password: ")
             if data.get(username):
                 print("Username already taken!")
+                continue
             else:
+                password = input("Password: ")
                 break
         registration(username, password)
         print("Registration successful. You are in the system!")
