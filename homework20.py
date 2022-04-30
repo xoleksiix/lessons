@@ -23,6 +23,13 @@ def write_data(file_name: str, data: dict):
         f.write(json.dumps(data))
 
 
+def check_username(data, username):
+    if data.get(username) is None:
+        return "unknow"
+    else:
+        return username
+
+
 def check_password(data: dict, username: str, password: str) -> bool:
     if data.get(username).get("password") != password:
         raise UserDoesNotExist("Wrong username or password!")
@@ -54,16 +61,12 @@ def login(username: str, password: str) -> bool:
 
 
 def add_last_time_login(data, user):
-    if data.get(username) is None:
-        user = "unknow"
     time_of_attempt = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
     data.get(user).update({"last_fail_attempt": time_of_attempt})
     write_data("data.json", data)
 
 
 def check_last_login(data, cd_for_login: int, username: str) -> int:
-    if data.get(username) is None:
-        username = "unknow"
     user_data = data.get(username)
     if user_data.get("last_fail_attempt") is None:
         return 0
@@ -112,32 +115,14 @@ if __name__ == '__main__':
         print("Registration successful. You are in the system!")
     elif ask.lower() == "in":
         while attempt > 0:
-            if (username or password) and attempt == 3:
-                if username and check_last_login(data, cooldown_for_login,
-                                                 username) > 0:
-                    print(f"You are blocked! Next try in "
-                          f"{check_last_login(data, cooldown_for_login, username)} "
-                          f"min.")
-                    break
-
-                if login(username if username else input("Username:"),
-                         password if password else input("Password:")):
-                    print("You are in the system!")
-                    break
-                else:
-                    attempt -= 1
-                    print(f"You have {attempt} attempt(s) left")
-                    continue
-
-            username = input("Username: ")
-            password = input("Password: ")
-
+            username = username if username else input("Username: ")
+            password = password if password else input("Password: ")
+            username = check_username(data, username)
             if check_last_login(data, cooldown_for_login, username) > 0:
                 print(f"You are blocked! Next try in "
                       f"{check_last_login(data, cooldown_for_login, username)} "
                       f"min.")
                 break
-
             if login(username, password):
                 print("You are in the system!")
                 break
@@ -148,5 +133,6 @@ if __name__ == '__main__':
                 else:
                     print("The attempts are over!")
                     add_last_time_login(data, username)
+                username, password = None, None
     else:
         print("Incorrect input!")
