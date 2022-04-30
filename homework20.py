@@ -13,7 +13,9 @@ def read_data(file_name: str) -> dict:
         with open(file_name, "r") as f:
             return json.loads(f.read())
     except FileNotFoundError:
-        return {}
+        return {"unknow": {"password": None, "last_fail_attempt": None}}
+        # сделано для записи времени неудачных попыток
+        # при логине, которого нет в списке зарегистрированых пользователей
 
 
 def write_data(file_name: str, data: dict):
@@ -22,9 +24,9 @@ def write_data(file_name: str, data: dict):
 
 
 def check_password(data: dict, username: str, password: str) -> bool:
-    if data.get(username) != password:
+    if data.get(username).get("password") != password:
         raise UserDoesNotExist("Wrong username or password!")
-    return data.get(username) == password
+    return data.get(username).get("password") == password
 
 
 def authenticate() -> bool:
@@ -51,18 +53,21 @@ def login(username: str, password: str) -> bool:
     return True
 
 
-def add_last_time_login(user):
-    data_of_logins = read_data("lasttimelogin.json")
-    last_time_login = {user: datetime.now().strftime("%m/%d/%Y, %H:%M:%S")}
-    data_of_logins.update(last_time_login)
-    write_data("lasttimelogin.json", data_of_logins)
+def add_last_time_login(data, user):
+    if data.get(username) is None:
+        user = "unknow"
+    time_of_attempt = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+    data.get(user).update({"last_fail_attempt": time_of_attempt})
+    write_data("data.json", data)
 
 
-def check_last_login(cd_for_login: int, username) -> int:
-    data_of_logins = read_data("lasttimelogin.json")
-    if data_of_logins.get(username) is None:
+def check_last_login(data, cd_for_login: int, username: str) -> int:
+    if data.get(username) is None:
+        username = "unknow"
+    user_data = data.get(username)
+    if user_data.get("last_fail_attempt") is None:
         return 0
-    last_time_login = datetime.strptime(data_of_logins.get(username),
+    last_time_login = datetime.strptime(user_data.get("last_fail_attempt"),
                                         "%m/%d/%Y, %H:%M:%S")
     return cd_for_login - ((datetime.now() - last_time_login).seconds // 60)
 
@@ -76,7 +81,13 @@ def parser():
 
 def registration(username: str, password: str):
     data = read_data("data.json")
-    data.update({username: password})
+    new_user = {
+        username: {
+            "password": password,
+            "last_fail_attempt": None
+        }
+    }
+    data.update(new_user)
     write_data("data.json", data)
 
 
@@ -101,15 +112,17 @@ if __name__ == '__main__':
     elif ask.lower() == "in":
         while attempt > 0:
             if (username or password) and attempt == 3:
-                if username and check_last_login(cooldown_for_login, username) > 0:
+                if username and check_last_login(data, cooldown_for_login,
+                                                 username) > 0:
                     print(f"You are blocked! Next try in "
-                          f"{check_last_login(cooldown_for_login, username)} "
+                          f"{check_last_login(data, cooldown_for_login, username)} "
                           f"min.")
                     break
 
                 if login(username if username else input("Username:"),
                          password if password else input("Password:")):
                     print("You are in the system!")
+                    break
                 else:
                     attempt -= 1
                     print(f"You have {attempt} attempt(s) left")
@@ -118,9 +131,9 @@ if __name__ == '__main__':
             username = input("Username: ")
             password = input("Password: ")
 
-            if check_last_login(cooldown_for_login, username) > 0:
+            if check_last_login(data, cooldown_for_login, username) > 0:
                 print(f"You are blocked! Next try in "
-                      f"{check_last_login(cooldown_for_login, username)} "
+                      f"{check_last_login(data, cooldown_for_login, username)} "
                       f"min.")
                 break
 
@@ -133,6 +146,6 @@ if __name__ == '__main__':
                     print(f"You have {attempt} attempt(s) left")
                 else:
                     print("The attempts are over!")
-                    add_last_time_login(username)
+                    add_last_time_login(data, username)
     else:
         print("Incorrect input!")
